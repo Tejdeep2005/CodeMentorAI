@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
 import { useTheme } from "@/context/ThemeContext";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CountdownTimer from "@/components/CountdownTimer";
 import WeeklyProgressChart from "@/components/WeeklyProgressChart";
 import { ExternalLink } from "lucide-react";
@@ -10,6 +10,7 @@ import { ExternalLink } from "lucide-react";
 export default function Dashboard() {
   const { user } = useUser();
   const { isDarkMode } = useTheme();
+  const navigate = useNavigate();
   const userName = user?.name || "User";
   const [stats, setStats] = useState({
     resumeScore: 0,
@@ -138,7 +139,10 @@ export default function Dashboard() {
           {stats.lastInterviewScore > 0 ? (
             <>
               <p className={isDarkMode ? "text-gray-400" : "text-gray-600"}>Your last score: <span className={`font-bold ${isDarkMode ? "text-purple-400" : "text-purple-600"}`}>{stats.lastInterviewScore}%</span></p>
-              <button className="mt-4 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+              <button 
+                onClick={() => navigate("/app/interview")}
+                className="mt-4 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+              >
                 Start Mock Interview
               </button>
             </>
