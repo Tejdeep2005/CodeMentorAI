@@ -20,8 +20,16 @@ export default function Dashboard() {
   });
   const [codingProfile, setCodingProfile] = useState(null);
   const [challenges, setChallenges] = useState([]);
-  const [streak, setStreak] = useState(0);
-  const [longestStreak, setLongestStreak] = useState(0);
+  const [streak, setStreak] = useState(() => {
+    // Load streak from localStorage if available
+    const cached = localStorage.getItem("userStreak");
+    return cached ? JSON.parse(cached) : 0;
+  });
+  const [longestStreak, setLongestStreak] = useState(() => {
+    // Load longest streak from localStorage if available
+    const cached = localStorage.getItem("userLongestStreak");
+    return cached ? JSON.parse(cached) : 0;
+  });
   const [leetcodeSolved, setLeetcodeSolved] = useState(0);
   const [solvedCount, setSolvedCount] = useState(0);
   const [totalChallenges, setTotalChallenges] = useState(0);
@@ -52,9 +60,11 @@ export default function Dashboard() {
           }).catch(() => ({ data: { contests: [] } })),
         ]);
         
-        // Always update streak from backend (don't cache it)
+        // Always update streak from backend and cache it
         setStreak(streakRes.data?.current || 0);
         setLongestStreak(streakRes.data?.longest || 0);
+        localStorage.setItem("userStreak", JSON.stringify(streakRes.data?.current || 0));
+        localStorage.setItem("userLongestStreak", JSON.stringify(streakRes.data?.longest || 0));
         
         // Cache other data in localStorage
         const dashboardData = {
