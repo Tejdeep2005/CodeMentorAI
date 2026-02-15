@@ -33,23 +33,40 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
         const [statsRes, profileRes, challengeRes, streakRes, contestsRes] = await Promise.all([
-          axios.get("http://localhost:3000/api/users/stats", {
+          axios.get(`${apiUrl}/api/users/stats`, {
             withCredentials: true,
           }),
-          axios.get("http://localhost:3000/api/coding-profile", {
+          axios.get(`${apiUrl}/api/coding-profile`, {
             withCredentials: true,
           }),
-          axios.get("http://localhost:3000/api/coding-profile/daily-challenge", {
+          axios.get(`${apiUrl}/api/coding-profile/daily-challenge`, {
             withCredentials: true,
           }).catch(() => ({ data: null })),
-          axios.get("http://localhost:3000/api/users/streak", {
+          axios.get(`${apiUrl}/api/users/streak`, {
             withCredentials: true,
           }).catch(() => ({ data: { current: 0, longest: 0 } })),
-          axios.get("http://localhost:3000/api/contests/upcoming", {
+          axios.get(`${apiUrl}/api/contests/upcoming`, {
             withCredentials: true,
           }).catch(() => ({ data: { contests: [] } })),
         ]);
+        
+        // Cache data in localStorage
+        const dashboardData = {
+          stats: statsRes.data,
+          profile: profileRes.data,
+          challenges: challengeRes.data?.challenges || [],
+          leetcodeSolved: challengeRes.data?.leetcodeSolved || 0,
+          solvedCount: challengeRes.data?.solvedCount || 0,
+          totalChallenges: challengeRes.data?.totalChallenges || 0,
+          streak: streakRes.data?.current || 0,
+          longestStreak: streakRes.data?.longest || 0,
+          contests: contestsRes.data?.contests || [],
+          timestamp: new Date().getTime(),
+        };
+        localStorage.setItem("dashboardCache", JSON.stringify(dashboardData));
+        
         setStats(statsRes.data);
         setCodingProfile(profileRes.data);
         if (challengeRes.data) {
@@ -58,17 +75,29 @@ export default function Dashboard() {
           setSolvedCount(challengeRes.data.solvedCount || 0);
           setTotalChallenges(challengeRes.data.totalChallenges || 0);
         }
-        // Set CodeMentor AI streak
         if (streakRes.data) {
           setStreak(streakRes.data.current || 0);
           setLongestStreak(streakRes.data.longest || 0);
         }
-        // Set contests
         if (contestsRes.data) {
           setContests(contestsRes.data.contests || []);
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
+        // Try to load from cache if fetch fails
+        const cached = localStorage.getItem("dashboardCache");
+        if (cached) {
+          const data = JSON.parse(cached);
+          setStats(data.stats);
+          setCodingProfile(data.profile);
+          setChallenges(data.challenges);
+          setLeetcodeSolved(data.leetcodeSolved);
+          setSolvedCount(data.solvedCount);
+          setTotalChallenges(data.totalChallenges);
+          setStreak(data.streak);
+          setLongestStreak(data.longestStreak);
+          setContests(data.contests);
+        }
       } finally {
         setLoading(false);
         setContestsLoading(false);
@@ -76,18 +105,40 @@ export default function Dashboard() {
     };
 
     if (user?._id) {
+      // Try to load from cache first
+      const cached = localStorage.getItem("dashboardCache");
+      if (cached) {
+        const data = JSON.parse(cached);
+        const cacheAge = new Date().getTime() - data.timestamp;
+        // Use cache if it's less than 5 minutes old
+        if (cacheAge < 5 * 60 * 1000) {
+          setStats(data.stats);
+          setCodingProfile(data.profile);
+          setChallenges(data.challenges);
+          setLeetcodeSolved(data.leetcodeSolved);
+          setSolvedCount(data.solvedCount);
+          setTotalChallenges(data.totalChallenges);
+          setStreak(data.streak);
+          setLongestStreak(data.longestStreak);
+          setContests(data.contests);
+          setLoading(false);
+          setContestsLoading(false);
+        }
+      }
+      
       fetchData();
-      // Refresh contests every hour
-      const contestInterval = setInterval(fetchData, 60 * 60 * 1000);
+      // Refresh data every 5 minutes
+      const contestInterval = setInterval(fetchData, 5 * 60 * 1000);
       return () => clearInterval(contestInterval);
     }
   }, [user]);
 
   const handleSolveChallenge = async (challengeId) => {
     setSolvingId(challengeId);
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/coding-profile/solve-challenge",
+        `${apiUrl}/api/coding-profile/solve-challenge`,
         { challengeId },
         { withCredentials: true }
       );
@@ -98,7 +149,7 @@ export default function Dashboard() {
 
       // Refresh challenges
       const challengeRes = await axios.get(
-        "http://localhost:3000/api/coding-profile/daily-challenge",
+        `${apiUrl}/api/coding-profile/daily-challenge`,
         { withCredentials: true }
       );
       setChallenges(challengeRes.data.challenges || []);
