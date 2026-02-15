@@ -13,8 +13,12 @@ const executeCode = asyncHandler(async (req, res) => {
       throw new Error("Code and language are required")
     }
 
+    console.log("Executing code:", { language, codeLength: code.length })
+
     // Use Judge0 API for code execution
     const result = await executeWithJudge0(code, language, input)
+
+    console.log("Execution result:", result)
 
     res.status(200).json({
       success: true,
@@ -77,6 +81,8 @@ const executeWithJudge0 = async (code, language, input) => {
       throw new Error(`Unsupported language: ${language}`)
     }
 
+    console.log("Judge0 submission:", { language, languageId, codeLength: code.length })
+
     // Submit code to Judge0
     const submitResponse = await axios.post(
       "https://judge0-ce.p.rapidapi.com/submissions",
@@ -93,6 +99,8 @@ const executeWithJudge0 = async (code, language, input) => {
         },
       }
     )
+
+    console.log("Judge0 submission response:", submitResponse.data)
 
     const token = submitResponse.data.token
 
@@ -112,6 +120,8 @@ const executeWithJudge0 = async (code, language, input) => {
         }
       )
 
+      console.log(`Judge0 poll attempt ${attempts + 1}:`, resultResponse.data.status)
+
       if (resultResponse.data.status.id > 2) {
         result = resultResponse.data
         break
@@ -125,6 +135,8 @@ const executeWithJudge0 = async (code, language, input) => {
       throw new Error("Code execution timeout")
     }
 
+    console.log("Judge0 final result:", result)
+
     return {
       output: result.stdout || "",
       error: result.stderr || result.compile_output || "",
@@ -133,6 +145,7 @@ const executeWithJudge0 = async (code, language, input) => {
     }
   } catch (error) {
     console.error("Judge0 execution error:", error.message)
+    console.error("Judge0 error details:", error.response?.data || error)
     return {
       output: "",
       error: error.message || "Execution failed",
