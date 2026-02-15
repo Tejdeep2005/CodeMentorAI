@@ -12,7 +12,6 @@ import {
   Code,
   BookOpen,
   Terminal,
-  MessageCircle,
 } from "lucide-react";
 
 import {
@@ -63,11 +62,6 @@ const mainItems = [
     url: "/app/code-editor",
     icon: Terminal,
   },
-  {
-    title: "DSA Chatbot",
-    url: "/app/dsa-chatbot",
-    icon: MessageCircle,
-  },
 ];
 
 const generalItems = [
@@ -92,10 +86,12 @@ export default function AppSidebar() {
   const navigate = useNavigate();
   const { logoutUser } = useUser();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await axios.post("http://localhost:3000/api/users/logout", {}, {
+      await axios.post(`${apiUrl}/api/users/logout`, {}, {
         withCredentials: true,
       });
       logoutUser();
