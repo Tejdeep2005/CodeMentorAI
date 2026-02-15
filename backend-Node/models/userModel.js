@@ -82,6 +82,14 @@ userSchema.methods.updateStreak = function () {
     lastLogin.setHours(0, 0, 0, 0)
   }
 
+  // If no previous login, start streak at 1
+  if (!lastLogin) {
+    this.streak.current = 1
+    this.streak.longest = 1
+    this.streak.lastLoginDate = new Date()
+    return this.streak.current
+  }
+
   const timeDiff = today - lastLogin
   const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
 
