@@ -132,8 +132,8 @@ export default function Dashboard() {
       
       // Always fetch fresh data from backend
       fetchData();
-      // Refresh data every 5 minutes
-      const contestInterval = setInterval(fetchData, 5 * 60 * 1000);
+      // Refresh data every week (7 days)
+      const contestInterval = setInterval(fetchData, 7 * 24 * 60 * 60 * 1000);
       return () => clearInterval(contestInterval);
     }
   }, [user]);
@@ -347,7 +347,13 @@ export default function Dashboard() {
             ) : (
               <div className="space-y-3">
                 {contests.slice(0, 3).map((contest) => (
-                  <div key={contest.id} className="backdrop-blur-md bg-white/5 border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all duration-300">
+                  <a
+                    key={contest.id}
+                    href={contest.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="backdrop-blur-md bg-white/5 border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all duration-300 block"
+                  >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
                         <h3 className="font-semibold text-white text-sm">{contest.title}</h3>
@@ -355,7 +361,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <CountdownTimer startTime={contest.startTime} title={contest.title} />
-                  </div>
+                  </a>
                 ))}
               </div>
             )}
