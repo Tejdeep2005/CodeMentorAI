@@ -1,4 +1,4 @@
-# 💼 Finally Placed - AI Powered Placement Assistant
+# 💼 CodeMentor AI - AI Powered Placement Assistant
 
 ![Project Banner](./screenshots/banner.png)
 
@@ -47,7 +47,7 @@ A sleek and personalized career development dashboard built with *React*. Design
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/Tejas-Santosh-Nalawade/Dev-Clash.git
-   cd Finally-Placed
+   cd CodeMentor-AI
    ```
 
 2. **Install Frontend Dependencies:**

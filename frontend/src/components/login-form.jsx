@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useNavigate } from "react-router"
 import { useState } from "react";
+import { useUser } from "@/context/UserContext";
 
 import {
   Card,
@@ -18,9 +19,9 @@ import { Label } from "@/components/ui/label";
 export function LoginForm(props) {
 
   const navigate = useNavigate()
+  const { loginUser } = useUser()
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
 
   
   const { className, ...rest } = props;
@@ -28,16 +29,20 @@ export function LoginForm(props) {
   const handleSubmit = async (e) => {
       e.preventDefault()
       try {
-        await axios.post("https://dev-backend-nine.vercel.app/api/users/auth", {
+        const response = await axios.post("http://localhost:3000/api/users/auth", {
           email,
           password,
+        }, {
+          withCredentials: true
         })
-        .then(() => {
+        if (response.status === 201) {
+          loginUser(response.data)
           navigate('/app')
-          console.log('User logged in')
-        })
+          console.log('User logged in:', response.data)
+        }
       } catch (error) {
-        console.log(error)
+        console.error('Login failed:', error.response?.data?.message || error.message)
+        alert('Login failed: ' + (error.response?.data?.message || 'Invalid credentials'))
       }
     }
 
@@ -87,7 +92,7 @@ export function LoginForm(props) {
             </div>
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}
-              <a href="/login" className="underline underline-offset-4">
+              <a href="/register" className="underline underline-offset-4">
                 Sign up
               </a>
             </div>

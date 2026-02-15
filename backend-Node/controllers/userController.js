@@ -1,5 +1,6 @@
 import asyncHandler from "express-async-handler"
 import User from "../models/userModel.js"
+import UserStats from "../models/userStatsModel.js"
 import generateToken from "../utils/generateToken.js"
 
 // @desc user token
@@ -11,12 +12,17 @@ const authUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email })
 
   if (user && (await user.matchPassword(password))) {
+    // Update streak on login
+    user.updateStreak()
+    await user.save()
+
     generateToken(res, user._id)
 
     res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
+      streak: user.streak,
     })
   } else {
     res.status(401)
@@ -47,6 +53,11 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(400)
     throw new Error("Invalid data")
   }
+
+  // Create user stats record
+  await UserStats.create({
+    userId: user._id,
+  })
 
   generateToken(res, user._id)
 
@@ -107,4 +118,36 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   }
 })
 
-export { authUser, registerUser, logoutUser, getUserProfile, updateUserProfile }
+// @desc get user stats
+// route /api/users/stats
+// @method get
+const getUserStats = asyncHandler(async (req, res) => {
+  const stats = await UserStats.findOne({ userId: req.user._id })
+
+  if (!stats) {
+    res.status(404)
+    throw new Error("Stats not found")
+  }
+
+  res.status(200).json(stats)
+})
+
+// @desc get user streak
+// route /api/users/streak
+// @method get
+const getUserStreak = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id)
+
+  if (!user) {
+    res.status(404)
+    throw new Error("User not found")
+  }
+
+  res.status(200).json({
+    current: user.streak.current,
+    longest: user.streak.longest,
+    lastLoginDate: user.streak.lastLoginDate,
+  })
+})
+
+export { authUser, registerUser, logoutUser, getUserProfile, updateUserProfile, getUserStats, getUserStreak }

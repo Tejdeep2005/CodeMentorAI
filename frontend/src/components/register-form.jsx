@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useNavigate } from "react-router"
 import { useState } from "react";
+import { useUser } from "@/context/UserContext";
 
 import {
   Card,
@@ -18,6 +19,7 @@ import { Label } from "@/components/ui/label";
 export function RegisterForm(props) {
 
   const navigate = useNavigate()
+  const { loginUser } = useUser()
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -29,18 +31,22 @@ export function RegisterForm(props) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      await axios
-        .post("https://dev-backend-nine.vercel.app/api/users/", {
+      const response = await axios
+        .post("http://localhost:3000/api/users/", {
           name,
           email,
           password,
+        }, {
+          withCredentials: true
         })
-        .then(() => {
-          navigate('/app')
-          console.log("User created")
-        })
+      if (response.status === 201) {
+        loginUser(response.data)
+        navigate('/app')
+        console.log("User created:", response.data)
+      }
     } catch (error) {
-      console.log(error)
+      console.error('Registration failed:', error.response?.data?.message || error.message)
+      alert('Registration failed: ' + (error.response?.data?.message || 'Please try again'))
     }
   }
 
@@ -48,9 +54,9 @@ export function RegisterForm(props) {
     <div className={cn("flex flex-col gap-6", className)} {...rest}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">SignIn</CardTitle>
+          <CardTitle className="text-2xl">Sign Up</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Enter your details below to create your account
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -93,16 +99,16 @@ export function RegisterForm(props) {
                 />
               </div>
               <Button type="submit" className="w-full bg-white text-black border border-gray-300 hover:bg-gray-100">
-                SignIn
+                Sign Up
               </Button>
               {/* <Button variant="outline" className="w-full">
                 Login with Google
               </Button> */}
             </div>
             <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <a href="#" className="underline underline-offset-4">
-                Sign up
+              Already have an account?{" "}
+              <a href="/login" className="underline underline-offset-4">
+                Sign in
               </a>
             </div>
           </form>

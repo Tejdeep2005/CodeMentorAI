@@ -48,12 +48,12 @@ const Hero = () => {
           </div>
 
           <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 max-w-5xl drop-shadow-xl tracking-tight">
-            Get Placed with <span className="text-purple-500">Finally Placed</span>
+            Get Placed with <span className="text-purple-500">CodeMentor AI</span>
             <span className="text-purple-300 animate-pulse">...</span>
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mb-12">
-            Finally Placed is a one stop solution for all your placement needs.
+            CodeMentor AI is a one stop solution for all your placement needs.
           </p>
 
           <div className="w-full max-w-5xl mx-auto mt-40">

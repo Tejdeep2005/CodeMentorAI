@@ -5,6 +5,8 @@ import {
   logoutUser,
   getUserProfile,
   updateUserProfile,
+  getUserStats,
+  getUserStreak,
 } from "../controllers/userController.js"
 import { protect } from "../middlewares/authMiddleware.js"
 import axios from "axios"
@@ -16,6 +18,8 @@ const router = express.Router()
 router.post("/", registerUser)
 router.post("/auth", authUser)
 router.post("/logout", logoutUser)
+router.get("/stats", protect, getUserStats)
+router.get("/streak", protect, getUserStreak)
 router
   .route("/profile")
   .get(protect, getUserProfile)
@@ -24,7 +28,5 @@ router
 router.get("/get" ,(req,res) =>{
   res.send("backend working")
 })
-
-
 
 export default router

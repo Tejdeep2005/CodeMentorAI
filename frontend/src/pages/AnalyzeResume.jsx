@@ -1,11 +1,14 @@
 import { useState } from "react";
 import axios from "axios";
 import jsPDF from "jspdf";
+import { useUser } from "@/context/UserContext";
 
 const AnalyzeResume = () => {
+    const { user } = useUser();
     const [file, setFile] = useState(null);
     const [jobDescription, setJobDescription] = useState("");
     const [analysis, setAnalysis] = useState("");
+    const [resumeScore, setResumeScore] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
@@ -26,14 +29,17 @@ const AnalyzeResume = () => {
 
         setLoading(true);
         setAnalysis("");
+        setResumeScore(null);
         setError("");
 
         try {
-            const response = await axios.post("http://127.0.0.1:8000/analyze-resume/", formData, {
-                headers: { "Content-Type": "multipart/form-data" }
+            const response = await axios.post("http://localhost:3000/analyze-resume/", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+                withCredentials: true,
             });
 
             setAnalysis(response.data.analysis);
+            setResumeScore(response.data.resumeScore);
         } catch (error) {
             console.error("Error analyzing resume:", error);
             setError("❌ Failed to analyze the resume. Please try again.");
@@ -97,6 +103,12 @@ const AnalyzeResume = () => {
 
                 {analysis && (
                     <div className="mt-8 border border-violet-500 p-4 rounded bg-gray-900">
+                        {resumeScore !== null && (
+                            <div className="mb-4 p-3 bg-violet-900 rounded border border-violet-500">
+                                <p className="text-violet-300 font-semibold">Resume Score: <span className="text-2xl text-violet-400">{resumeScore}%</span></p>
+                                <p className="text-sm text-gray-300 mt-1">This score has been saved to your dashboard</p>
+                            </div>
+                        )}
                         <h3 className="text-xl font-semibold mb-2 text-violet-300">📝 Analysis Report:</h3>
                         <pre className="whitespace-pre-wrap text-gray-200 text-sm">{analysis}</pre>
 

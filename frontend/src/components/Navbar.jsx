@@ -11,7 +11,7 @@ const Navbar = () => {
       {/* Logo */}
       <div className="text-lg font-semibold flex items-center space-x-2">
         {/* <img src="/logo.png" alt="Reflect Logo" className="w-6 h-6" /> */}
-        <span>Finally Placed</span>
+        <span>CodeMentor AI</span>
       </div>
 
       {/* Desktop Navigation */}

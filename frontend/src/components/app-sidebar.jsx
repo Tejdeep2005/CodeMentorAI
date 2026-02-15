@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Calendar,
   Home,
@@ -9,6 +9,10 @@ import {
   Settings,
   HelpCircle,
   LogOut,
+  Code,
+  BookOpen,
+  Terminal,
+  MessageCircle,
 } from "lucide-react";
 
 import {
@@ -44,25 +48,68 @@ const mainItems = [
     url: "/app/job",
     icon: Briefcase,
   },
+  {
+    title: "Coding Profiles",
+    url: "/app/coding-profiles",
+    icon: Code,
+  },
+  {
+    title: "DSA Roadmap",
+    url: "/app/dsa-roadmap",
+    icon: BookOpen,
+  },
+  {
+    title: "Code Editor",
+    url: "/app/code-editor",
+    icon: Terminal,
+  },
+  {
+    title: "DSA Chatbot",
+    url: "/app/dsa-chatbot",
+    icon: MessageCircle,
+  },
 ];
 
 const generalItems = [
   {
     title: "Profile",
-    url: "#",
+    url: "/app/profile",
     icon: User,
   },
   {
     title: "Setting",
-    url: "#",
+    url: "/app/settings",
     icon: Settings,
   },
 ];
 
-import {Link , useLocation} from 'react-router-dom';
+import {Link , useLocation, useNavigate} from 'react-router-dom';
+import { useUser } from '@/context/UserContext';
+import axios from 'axios';
 
 export default function AppSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logoutUser } = useUser();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await axios.post("http://localhost:3000/api/users/logout", {}, {
+        withCredentials: true,
+      });
+      logoutUser();
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Still logout locally even if API call fails
+      logoutUser();
+      navigate("/login");
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <div className="relative h-full">
       <Sidebar className="bg-[#121212] text-gray-300 border-r border-gray-800 h-full flex flex-col">
@@ -70,7 +117,7 @@ export default function AppSidebar() {
           {/* Logo */}
           <div className="flex items-center gap-2 px-4 py-4 mb-4">
             
-            <span className="font-semibold text-white">Finally Placed</span>
+            <span className="font-semibold text-white">CodeMentor AI</span>
           </div>
           
           {/* Main menu */}
@@ -111,13 +158,17 @@ export default function AppSidebar() {
                 {generalItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
-                      <a
-                        href={item.url}
-                        className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-800 hover:text-white transition-all"
+                      <Link
+                        to={item.url}
+                        className={`flex items-center gap-3 px-4 py-2 rounded-lg ${
+                           location.pathname === item.url
+                             ? "bg-purple-600 text-white" 
+                             : "hover:bg-gray-800 hover:text-white"
+                         } transition-all`}
                       >
                         <item.icon className="w-5 h-5 text-gray-400" />
                         <span className="text-sm">{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
@@ -136,13 +187,14 @@ export default function AppSidebar() {
           
           {/* Logout button */}
           <div className="mt-auto mb-4 px-4">
-            <a
-              href="#"
-              className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-all"
+            <button
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="w-full flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-all disabled:opacity-50"
             >
               <LogOut className="w-5 h-5" />
-              <span className="text-sm">Log Out</span>
-            </a>
+              <span className="text-sm">{isLoggingOut ? "Logging out..." : "Log Out"}</span>
+            </button>
           </div>
         </SidebarContent>
       </Sidebar>

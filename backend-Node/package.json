@@ -1,5 +1,5 @@
 {
-  "name": "backend-node",
+  "name": "codementor-ai-backend",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,12 @@
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
     "express-async-handler": "^1.2.0",
+    "form-data": "^4.0.5",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.13.2"
+    "mongoose": "^8.13.2",
+    "multer": "^2.0.2",
+    "nodemailer": "^6.9.7",
+    "node-cron": "^3.0.2",
+    "pdf-parse": "^2.4.5"
   }
 }

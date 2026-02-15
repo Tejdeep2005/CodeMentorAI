@@ -7,11 +7,16 @@ const JobRecommendations = () => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const jobsPerPage = 12;
 
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const res = await axios.get("https://dev-backend-nine.vercel.app/job-recommendations");
+        const res = await axios.get("http://localhost:3000/api/jobs/recommendations", {
+          withCredentials: true,
+        });
+        console.log("Jobs fetched:", res.data.jobs.length);
         setJobs(res.data.jobs);
         setFilteredJobs(res.data.jobs);
         setLoading(false);
@@ -28,6 +33,7 @@ const JobRecommendations = () => {
   const handleSearchChange = (e) => {
     const value = e.target.value.toLowerCase();
     setSearch(value);
+    setCurrentPage(1);
 
     const filtered = jobs.filter((job) =>
       job.job_title.toLowerCase().includes(value) ||
@@ -39,6 +45,26 @@ const JobRecommendations = () => {
     setFilteredJobs(filtered);
   };
 
+  // Pagination logic
+  const indexOfLastJob = currentPage * jobsPerPage;
+  const indexOfFirstJob = indexOfLastJob - jobsPerPage;
+  const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
+  const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+      window.scrollTo(0, 0);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      window.scrollTo(0, 0);
+    }
+  };
+
   if (loading) return <p className="text-center text-gray-500 mt-10">Fetching jobs...</p>;
   if (error) return <p className="text-center text-red-500 mt-10">{error}</p>;
 
@@ -46,7 +72,8 @@ const JobRecommendations = () => {
     <div className="min-h-screen bg-[#f9fafb] p-6 space-y-10">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-800">💼 Recommended Jobs for You</h1>
+        <h1 className="text-3xl font-bold text-gray-800">💼 Job Recommendations for You</h1>
+        <p className="text-gray-600 mt-2">Total jobs available: {filteredJobs.length}</p>
       </div>
 
       {/* Search Input */}
@@ -61,9 +88,9 @@ const JobRecommendations = () => {
       </div>
 
       {/* Job Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredJobs.length > 0 ? (
-          filteredJobs.map((job, index) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+        {currentJobs.length > 0 ? (
+          currentJobs.map((job, index) => (
             <div
               key={index}
               className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition"
@@ -76,6 +103,11 @@ const JobRecommendations = () => {
                 Type: {job.job_employment_type} | Posted:{" "}
                 {new Date(job.job_posted_at_datetime_utc).toLocaleDateString()}
               </p>
+              {job.salary_min && job.salary_max && (
+                <p className="text-sm text-green-600 font-semibold mt-2">
+                  ₹{Math.round(job.salary_min / 100000)}L - ₹{Math.round(job.salary_max / 100000)}L
+                </p>
+              )}
               <a
                 href={job.job_apply_link}
                 target="_blank"
@@ -90,6 +122,29 @@ const JobRecommendations = () => {
           <p className="text-center text-gray-500 col-span-3">No jobs found for your search 😕</p>
         )}
       </div>
+
+      {/* Pagination */}
+      {filteredJobs.length > jobsPerPage && (
+        <div className="flex justify-center items-center gap-4 mt-10">
+          <button
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+            className="px-4 py-2 bg-purple-600 text-white rounded-md disabled:bg-gray-400 hover:bg-purple-700"
+          >
+            Previous
+          </button>
+          <span className="text-gray-700 font-semibold">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 bg-purple-600 text-white rounded-md disabled:bg-gray-400 hover:bg-purple-700"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };
