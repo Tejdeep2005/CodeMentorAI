@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useTheme } from "@/context/ThemeContext";
-import { Play, Copy, Download, Trash2, MessageCircle } from "lucide-react";
+import { Play, Copy, Download, Trash2, MessageCircle, X } from "lucide-react";
 
 const CodeEditor = () => {
   const { isDarkMode } = useTheme();
@@ -17,19 +17,25 @@ const CodeEditor = () => {
   // Load Noupe chatbot script when showChat is true
   useEffect(() => {
     if (showChat) {
-      // Clear any existing script
-      const existingScript = document.querySelector('script[src*="noupe.com/embed"]');
-      if (existingScript) {
-        existingScript.remove();
-      }
+      // Remove any existing Noupe script
+      const existingScripts = document.querySelectorAll('script[src*="noupe.com"]');
+      existingScripts.forEach(script => script.remove());
 
-      // Add a small delay to ensure DOM is ready
-      setTimeout(() => {
+      // Add delay to ensure DOM is ready
+      const timer = setTimeout(() => {
         const script = document.createElement("script");
         script.src = "https://www.noupe.com/embed/019c5fc4cfac7578b7dbb55a4fda9bfce510.js";
         script.async = true;
+        script.onload = () => {
+          console.log("Noupe chatbot script loaded");
+        };
+        script.onerror = () => {
+          console.error("Failed to load Noupe chatbot script");
+        };
         document.body.appendChild(script);
-      }, 100);
+      }, 200);
+
+      return () => clearTimeout(timer);
     }
   }, [showChat]);
 
@@ -275,17 +281,27 @@ const CodeEditor = () => {
 
             {/* Noupe AI Chat */}
             {showChat && (
-              <div className={`rounded-lg shadow-lg overflow-visible ${
-                isDarkMode ? "bg-gray-800" : "bg-white"
+              <div className={`rounded-lg shadow-lg border-2 ${
+                isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
               }`}>
-                <div className={`p-4 border-b font-semibold ${isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-gray-50"}`}>
-                  🤖 AI Assistant
+                <div className={`p-4 border-b font-semibold flex justify-between items-center ${isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-gray-50"}`}>
+                  <span>🤖 AI Assistant</span>
+                  <button
+                    onClick={() => setShowChat(false)}
+                    className="p-1 hover:bg-gray-300 rounded"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
-                <div className={`p-4 min-h-96 relative ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
-                  <p className={`text-sm mb-4 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-                    The AI assistant is loading below. Ask any questions about your code!
-                  </p>
-                  {/* Noupe chatbot will be injected here as a floating widget */}
+                <div className={`p-4 min-h-96 flex items-center justify-center ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
+                  <div className="text-center">
+                    <p className={`text-sm mb-4 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                      AI Assistant is loading...
+                    </p>
+                    <p className={`text-xs ${isDarkMode ? "text-gray-500" : "text-gray-500"}`}>
+                      The chatbot will appear as a floating widget on the page
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
