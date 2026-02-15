@@ -6,8 +6,17 @@ import { ChevronDown, ChevronUp, ExternalLink, CheckCircle2, Circle } from "luci
 const DSARoadmap = () => {
   const { isDarkMode } = useTheme();
   const [expandedCategory, setExpandedCategory] = useState(null);
-  const [solvedProblems, setSolvedProblems] = useState(new Set());
+  const [solvedProblems, setSolvedProblems] = useState(() => {
+    // Load from localStorage on initial render
+    const saved = localStorage.getItem("dsaRoadmapProgress");
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
   const [filterDifficulty, setFilterDifficulty] = useState("All");
+
+  // Save to localStorage whenever solvedProblems changes
+  React.useEffect(() => {
+    localStorage.setItem("dsaRoadmapProgress", JSON.stringify(Array.from(solvedProblems)));
+  }, [solvedProblems]);
 
   const toggleCategory = (categoryId) => {
     setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
