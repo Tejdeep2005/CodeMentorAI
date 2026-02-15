@@ -17,16 +17,19 @@ const CodeEditor = () => {
   // Load Noupe chatbot script when showChat is true
   useEffect(() => {
     if (showChat) {
-      const script = document.createElement("script");
-      script.src = "https://www.noupe.com/embed/019c5fc4cfac7578b7dbb55a4fda9bfce510.js";
-      script.async = true;
-      document.body.appendChild(script);
+      // Clear any existing script
+      const existingScript = document.querySelector('script[src*="noupe.com/embed"]');
+      if (existingScript) {
+        existingScript.remove();
+      }
 
-      return () => {
-        if (document.body.contains(script)) {
-          document.body.removeChild(script);
-        }
-      };
+      // Add a small delay to ensure DOM is ready
+      setTimeout(() => {
+        const script = document.createElement("script");
+        script.src = "https://www.noupe.com/embed/019c5fc4cfac7578b7dbb55a4fda9bfce510.js";
+        script.async = true;
+        document.body.appendChild(script);
+      }, 100);
     }
   }, [showChat]);
 
@@ -272,14 +275,17 @@ const CodeEditor = () => {
 
             {/* Noupe AI Chat */}
             {showChat && (
-              <div className={`rounded-lg shadow-lg overflow-hidden ${
+              <div className={`rounded-lg shadow-lg overflow-visible ${
                 isDarkMode ? "bg-gray-800" : "bg-white"
               }`}>
                 <div className={`p-4 border-b font-semibold ${isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-gray-50"}`}>
                   🤖 AI Assistant
                 </div>
-                <div className={`p-4 min-h-96 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
-                  {/* Noupe chatbot will be injected here */}
+                <div className={`p-4 min-h-96 relative ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
+                  <p className={`text-sm mb-4 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                    The AI assistant is loading below. Ask any questions about your code!
+                  </p>
+                  {/* Noupe chatbot will be injected here as a floating widget */}
                 </div>
               </div>
             )}
