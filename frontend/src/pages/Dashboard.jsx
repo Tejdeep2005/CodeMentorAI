@@ -52,7 +52,11 @@ export default function Dashboard() {
           }).catch(() => ({ data: { contests: [] } })),
         ]);
         
-        // Cache data in localStorage
+        // Always update streak from backend (don't cache it)
+        setStreak(streakRes.data?.current || 0);
+        setLongestStreak(streakRes.data?.longest || 0);
+        
+        // Cache other data in localStorage
         const dashboardData = {
           stats: statsRes.data,
           profile: profileRes.data,
@@ -60,8 +64,6 @@ export default function Dashboard() {
           leetcodeSolved: challengeRes.data?.leetcodeSolved || 0,
           solvedCount: challengeRes.data?.solvedCount || 0,
           totalChallenges: challengeRes.data?.totalChallenges || 0,
-          streak: streakRes.data?.current || 0,
-          longestStreak: streakRes.data?.longest || 0,
           contests: contestsRes.data?.contests || [],
           timestamp: new Date().getTime(),
         };
@@ -74,10 +76,6 @@ export default function Dashboard() {
           setLeetcodeSolved(challengeRes.data.leetcodeSolved || 0);
           setSolvedCount(challengeRes.data.solvedCount || 0);
           setTotalChallenges(challengeRes.data.totalChallenges || 0);
-        }
-        if (streakRes.data) {
-          setStreak(streakRes.data.current || 0);
-          setLongestStreak(streakRes.data.longest || 0);
         }
         if (contestsRes.data) {
           setContests(contestsRes.data.contests || []);
@@ -94,8 +92,6 @@ export default function Dashboard() {
           setLeetcodeSolved(data.leetcodeSolved);
           setSolvedCount(data.solvedCount);
           setTotalChallenges(data.totalChallenges);
-          setStreak(data.streak);
-          setLongestStreak(data.longestStreak);
           setContests(data.contests);
         }
       } finally {
@@ -105,7 +101,7 @@ export default function Dashboard() {
     };
 
     if (user?._id) {
-      // Try to load from cache first
+      // Try to load from cache first for faster initial load
       const cached = localStorage.getItem("dashboardCache");
       if (cached) {
         const data = JSON.parse(cached);
@@ -118,14 +114,13 @@ export default function Dashboard() {
           setLeetcodeSolved(data.leetcodeSolved);
           setSolvedCount(data.solvedCount);
           setTotalChallenges(data.totalChallenges);
-          setStreak(data.streak);
-          setLongestStreak(data.longestStreak);
           setContests(data.contests);
           setLoading(false);
           setContestsLoading(false);
         }
       }
       
+      // Always fetch fresh data from backend
       fetchData();
       // Refresh data every 5 minutes
       const contestInterval = setInterval(fetchData, 5 * 60 * 1000);
