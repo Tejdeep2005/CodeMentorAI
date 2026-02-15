@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useTheme } from "@/context/ThemeContext";
 import { dsaRoadmap } from "../data/dsaRoadmap";
 import { ChevronDown, ChevronUp, ExternalLink, CheckCircle2, Circle } from "lucide-react";
 
 const DSARoadmap = () => {
+  const { isDarkMode } = useTheme();
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [solvedProblems, setSolvedProblems] = useState(new Set());
   const [filterDifficulty, setFilterDifficulty] = useState("All");
@@ -33,13 +35,13 @@ const DSARoadmap = () => {
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
       case "Easy":
-        return "text-green-600 bg-green-50";
+        return isDarkMode ? "text-green-400 bg-green-900" : "text-green-600 bg-green-50";
       case "Medium":
-        return "text-yellow-600 bg-yellow-50";
+        return isDarkMode ? "text-yellow-400 bg-yellow-900" : "text-yellow-600 bg-yellow-50";
       case "Hard":
-        return "text-red-600 bg-red-50";
+        return isDarkMode ? "text-red-400 bg-red-900" : "text-red-600 bg-red-50";
       default:
-        return "text-gray-600 bg-gray-50";
+        return isDarkMode ? "text-gray-400 bg-gray-700" : "text-gray-600 bg-gray-50";
     }
   };
 
@@ -57,29 +59,35 @@ const DSARoadmap = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+    <div className={`min-h-screen p-6 transition-colors duration-300 ${
+      isDarkMode 
+        ? "bg-gradient-to-br from-gray-900 to-gray-800" 
+        : "bg-gradient-to-br from-slate-50 to-slate-100"
+    }`}>
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-8">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">📚 DSA Mastery Roadmap</h1>
-          <p className="text-gray-600">Master Data Structures & Algorithms with a structured learning path</p>
+          <h1 className={`text-4xl font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"}`}>📚 DSA Mastery Roadmap</h1>
+          <p className={isDarkMode ? "text-gray-400" : "text-gray-600"}>Master Data Structures & Algorithms with a structured learning path</p>
         </div>
 
         {/* Progress Section */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className={`rounded-lg shadow-md p-6 mb-8 transition-colors duration-300 ${
+          isDarkMode ? "bg-gray-800 border border-gray-700" : "bg-white"
+        }`}>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">Your Progress</h2>
-            <span className="text-2xl font-bold text-purple-600">
+            <h2 className={`text-xl font-semibold ${isDarkMode ? "text-white" : "text-gray-800"}`}>Your Progress</h2>
+            <span className={`text-2xl font-bold ${isDarkMode ? "text-purple-400" : "text-purple-600"}`}>
               {solvedCount}/{totalProblems}
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3">
+          <div className={`w-full rounded-full h-3 ${isDarkMode ? "bg-gray-700" : "bg-gray-200"}`}>
             <div
               className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all duration-300"
               style={{ width: `${progressPercentage}%` }}
             ></div>
           </div>
-          <p className="text-sm text-gray-600 mt-2">{progressPercentage}% Complete</p>
+          <p className={`text-sm mt-2 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>{progressPercentage}% Complete</p>
         </div>
 
         {/* Filter Section */}
@@ -91,6 +99,8 @@ const DSARoadmap = () => {
               className={`px-4 py-2 rounded-lg font-medium transition ${
                 filterDifficulty === level
                   ? "bg-purple-600 text-white"
+                  : isDarkMode
+                  ? "bg-gray-800 text-gray-300 border border-gray-700 hover:border-purple-400"
                   : "bg-white text-gray-700 border border-gray-300 hover:border-purple-400"
               }`}
             >
@@ -105,44 +115,54 @@ const DSARoadmap = () => {
         {filteredRoadmap.map((category) => (
           <div
             key={category.id}
-            className={`bg-white rounded-lg shadow-md overflow-hidden transition ${getCategoryColor(
+            className={`rounded-lg shadow-md overflow-hidden transition ${getCategoryColor(
               category.difficulty
-            )}`}
+            )} ${isDarkMode ? "bg-gray-800 border border-gray-700" : "bg-white"}`}
           >
             {/* Category Header */}
             <button
               onClick={() => toggleCategory(category.id)}
-              className="w-full px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition"
+              className={`w-full px-6 py-4 flex justify-between items-center transition ${
+                isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"
+              }`}
             >
               <div className="flex items-center gap-4 text-left">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800">{category.category}</h3>
-                  <p className="text-sm text-gray-500">
+                  <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-gray-800"}`}>{category.category}</h3>
+                  <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
                     {category.problems.filter((p) => solvedProblems.has(p.id)).length}/
                     {category.problems.length} problems solved
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-xs font-semibold px-3 py-1 rounded-full bg-gray-100 text-gray-700">
+                <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
+                  isDarkMode ? "bg-gray-700 text-gray-300" : "bg-gray-100 text-gray-700"
+                }`}>
                   {category.difficulty}
                 </span>
                 {expandedCategory === category.id ? (
-                  <ChevronUp className="w-5 h-5 text-gray-600" />
+                  <ChevronUp className={`w-5 h-5 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`} />
                 ) : (
-                  <ChevronDown className="w-5 h-5 text-gray-600" />
+                  <ChevronDown className={`w-5 h-5 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`} />
                 )}
               </div>
             </button>
 
             {/* Problems List */}
             {expandedCategory === category.id && (
-              <div className="border-t border-gray-200 divide-y">
+              <div className={`border-t divide-y ${isDarkMode ? "border-gray-700 divide-gray-700" : "border-gray-200"}`}>
                 {category.problems.map((problem) => (
                   <div
                     key={problem.id}
-                    className={`px-6 py-4 flex items-start gap-4 hover:bg-gray-50 transition ${
-                      solvedProblems.has(problem.id) ? "bg-green-50" : ""
+                    className={`px-6 py-4 flex items-start gap-4 transition ${
+                      isDarkMode
+                        ? solvedProblems.has(problem.id)
+                          ? "bg-green-900 bg-opacity-30 hover:bg-opacity-40"
+                          : "hover:bg-gray-700"
+                        : solvedProblems.has(problem.id)
+                        ? "bg-green-50 hover:bg-green-100"
+                        : "hover:bg-gray-50"
                     }`}
                   >
                     {/* Checkbox */}
@@ -153,7 +173,7 @@ const DSARoadmap = () => {
                       {solvedProblems.has(problem.id) ? (
                         <CheckCircle2 className="w-6 h-6 text-green-600" />
                       ) : (
-                        <Circle className="w-6 h-6 text-gray-400 hover:text-gray-600" />
+                        <Circle className={`w-6 h-6 ${isDarkMode ? "text-gray-600 hover:text-gray-400" : "text-gray-400 hover:text-gray-600"}`} />
                       )}
                     </button>
 
@@ -162,10 +182,14 @@ const DSARoadmap = () => {
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <h4
-                            className={`font-semibold text-gray-800 ${
+                            className={`font-semibold ${
                               solvedProblems.has(problem.id)
-                                ? "line-through text-gray-500"
-                                : ""
+                                ? isDarkMode
+                                  ? "line-through text-gray-500"
+                                  : "line-through text-gray-500"
+                                : isDarkMode
+                                ? "text-white"
+                                : "text-gray-800"
                             }`}
                           >
                             {problem.title}
@@ -174,7 +198,11 @@ const DSARoadmap = () => {
                             {problem.topics.map((topic) => (
                               <span
                                 key={topic}
-                                className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded"
+                                className={`text-xs px-2 py-1 rounded ${
+                                  isDarkMode
+                                    ? "bg-blue-900 text-blue-300"
+                                    : "bg-blue-100 text-blue-700"
+                                }`}
                               >
                                 {topic}
                               </span>
@@ -210,24 +238,26 @@ const DSARoadmap = () => {
       </div>
 
       {/* Footer Stats */}
-      <div className="max-w-6xl mx-auto mt-12 bg-white rounded-lg shadow-md p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">📊 Statistics</h3>
+      <div className={`max-w-6xl mx-auto mt-12 rounded-lg shadow-md p-6 transition-colors duration-300 ${
+        isDarkMode ? "bg-gray-800 border border-gray-700" : "bg-white"
+      }`}>
+        <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? "text-white" : "text-gray-800"}`}>📊 Statistics</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <p className="text-3xl font-bold text-purple-600">{totalProblems}</p>
-            <p className="text-sm text-gray-600">Total Problems</p>
+            <p className={`text-3xl font-bold ${isDarkMode ? "text-purple-400" : "text-purple-600"}`}>{totalProblems}</p>
+            <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>Total Problems</p>
           </div>
           <div className="text-center">
-            <p className="text-3xl font-bold text-green-600">{solvedCount}</p>
-            <p className="text-sm text-gray-600">Problems Solved</p>
+            <p className={`text-3xl font-bold ${isDarkMode ? "text-green-400" : "text-green-600"}`}>{solvedCount}</p>
+            <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>Problems Solved</p>
           </div>
           <div className="text-center">
-            <p className="text-3xl font-bold text-blue-600">{totalProblems - solvedCount}</p>
-            <p className="text-sm text-gray-600">Remaining</p>
+            <p className={`text-3xl font-bold ${isDarkMode ? "text-blue-400" : "text-blue-600"}`}>{totalProblems - solvedCount}</p>
+            <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>Remaining</p>
           </div>
           <div className="text-center">
-            <p className="text-3xl font-bold text-orange-600">{progressPercentage}%</p>
-            <p className="text-sm text-gray-600">Progress</p>
+            <p className={`text-3xl font-bold ${isDarkMode ? "text-orange-400" : "text-orange-600"}`}>{progressPercentage}%</p>
+            <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>Progress</p>
           </div>
         </div>
       </div>
