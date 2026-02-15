@@ -116,151 +116,140 @@ export default function Dashboard() {
   const hasAnyProfile = codingProfile?.leetcodeId || codingProfile?.hackerrankId || codingProfile?.codechefId;
 
   return (
-    <div className={`min-h-screen p-6 space-y-6 transition-colors duration-300 ${
-      isDarkMode ? "bg-gray-900" : "bg-[#f9fafb]"
-    }`}>
-      {/* Header */}
-      <h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}>👋 Welcome, {userName}!</h1>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard title="Resume Score" value={loading ? "-" : `${stats.resumeScore}%`} />
-        <StatCard title="Interviews Given" value={loading ? "-" : stats.interviewsGiven} />
-        <StatCard title="Past Interview Score" value={loading ? "-" : `${stats.lastInterviewScore}%`} />
-        <StatCard title="Challenges Completed" value={loading ? "-" : leetcodeSolved} icon="🎯" />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* AI Interview */}
-        <div className={`p-6 rounded-xl shadow-md col-span-2 transition-colors duration-300 ${
-          isDarkMode ? "bg-gray-800 border border-gray-700" : "bg-white"
-        }`}>
-          <h2 className={`text-xl font-semibold mb-2 ${isDarkMode ? "text-white" : ""}`}>🤖 AI Interview</h2>
-          {stats.lastInterviewScore > 0 ? (
-            <>
-              <p className={isDarkMode ? "text-gray-400" : "text-gray-600"}>Your last score: <span className={`font-bold ${isDarkMode ? "text-purple-400" : "text-purple-600"}`}>{stats.lastInterviewScore}%</span></p>
-              <button 
-                onClick={() => navigate("/app/interview")}
-                className="mt-4 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
-              >
-                Start Mock Interview
-              </button>
-            </>
-          ) : (
-            <p className={isDarkMode ? "text-gray-400" : "text-gray-500"}>No interviews taken yet. Start your first mock interview!</p>
-          )}
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-white mb-2">👋 Welcome, {userName}!</h1>
+          <p className="text-gray-400">Track your progress and master DSA</p>
         </div>
 
-        {/* Coding Progress */}
-        <div className={`p-6 rounded-xl shadow-md transition-colors duration-300 ${
-          isDarkMode ? "bg-gray-800 border border-gray-700" : "bg-white"
-        }`}>
-          <h2 className={`text-xl font-semibold mb-2 ${isDarkMode ? "text-white" : ""}`}>💻 Coding Progress</h2>
-          {!hasAnyProfile ? (
-            <div>
-              <p className={`text-sm mb-3 ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>Connect your coding profiles to track progress</p>
-              <Link
-                to="/app/coding-profiles"
-                className="inline-block bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700"
-              >
-                Add Profiles
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {codingProfile?.leetcodeId && (
-                <div className={`border-l-4 border-orange-500 pl-3 ${isDarkMode ? "bg-gray-700 p-2 rounded" : ""}`}>
-                  <p className={`font-semibold text-sm ${isDarkMode ? "text-white" : ""}`}>LeetCode</p>
-                  <p className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-                    {codingProfile.leetcodeStats?.solved || 0} problems solved
-                  </p>
-                </div>
-              )}
-              {codingProfile?.hackerrankId && (
-                <div className={`border-l-4 border-green-500 pl-3 ${isDarkMode ? "bg-gray-700 p-2 rounded" : ""}`}>
-                  <p className={`font-semibold text-sm ${isDarkMode ? "text-white" : ""}`}>HackerRank</p>
-                  <p className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-                    {codingProfile.hackerrankStats?.solved || 0} problems solved
-                  </p>
-                </div>
-              )}
-              {codingProfile?.codechefId && (
-                <div className={`border-l-4 border-purple-500 pl-3 ${isDarkMode ? "bg-gray-700 p-2 rounded" : ""}`}>
-                  <p className={`font-semibold text-sm ${isDarkMode ? "text-white" : ""}`}>CodeChef</p>
-                  <p className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-                    Rating: {codingProfile.codechefStats?.rating || 0}
-                  </p>
-                </div>
-              )}
-              {codingProfile?.geeksforgeeksId && (
-                <div className={`border-l-4 border-green-700 pl-3 ${isDarkMode ? "bg-gray-700 p-2 rounded" : ""}`}>
-                  <p className={`font-semibold text-sm ${isDarkMode ? "text-white" : ""}`}>GeeksforGeeks</p>
-                  <p className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-                    {codingProfile.geeksforgeeksStats?.solved || 0} problems solved
-                  </p>
-                </div>
-              )}
-              <Link
-                to="/app/coding-profiles"
-                className={`inline-block text-xs hover:underline mt-2 ${isDarkMode ? "text-blue-400" : "text-blue-600"}`}
-              >
-                View Details →
-              </Link>
-            </div>
-          )}
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <StatCard 
+            title="Resume Score" 
+            value={loading ? "-" : `${stats.resumeScore}%`}
+            icon="📄"
+            gradient="from-orange-500 to-red-500"
+          />
+          <StatCard 
+            title="Interviews" 
+            value={loading ? "-" : stats.interviewsGiven}
+            icon="🎤"
+            gradient="from-purple-500 to-pink-500"
+          />
+          <StatCard 
+            title="Last Score" 
+            value={loading ? "-" : `${stats.lastInterviewScore}%`}
+            icon="⭐"
+            gradient="from-blue-500 to-cyan-500"
+          />
+          <StatCard 
+            title="Challenges" 
+            value={loading ? "-" : leetcodeSolved}
+            icon="🎯"
+            gradient="from-green-500 to-emerald-500"
+          />
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Daily Coding Challenges */}
-        <div className={`p-6 rounded-xl shadow-md col-span-2 transition-colors duration-300 ${
-          isDarkMode ? "bg-gray-800 border border-gray-700" : "bg-white"
-        }`}>
-          <h2 className={`text-xl font-semibold mb-2 ${isDarkMode ? "text-white" : ""}`}>🎯 Daily Coding Challenges</h2>
-          <p className={`text-sm mb-4 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-            Solved: {solvedCount}/{totalChallenges} | Complete challenges to unlock new ones!
-          </p>
+        {/* Main Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* AI Interview Card */}
+          <div className="lg:col-span-2 backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-white">🤖 AI Interview</h2>
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-xl">
+                🎬
+              </div>
+            </div>
+            {stats.lastInterviewScore > 0 ? (
+              <>
+                <p className="text-gray-300 mb-4">Your last score: <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">{stats.lastInterviewScore}%</span></p>
+                <button 
+                  onClick={() => navigate("/app/interview")}
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105"
+                >
+                  Start Mock Interview
+                </button>
+              </>
+            ) : (
+              <p className="text-gray-400">No interviews taken yet. Start your first mock interview!</p>
+            )}
+          </div>
+
+          {/* Coding Progress Card */}
+          <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 shadow-2xl">
+            <h2 className="text-xl font-bold text-white mb-4">💻 Coding Progress</h2>
+            {!hasAnyProfile ? (
+              <div>
+                <p className="text-sm text-gray-400 mb-4">Connect your coding profiles to track progress</p>
+                <Link
+                  to="/app/coding-profiles"
+                  className="inline-block w-full text-center bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300"
+                >
+                  Add Profiles
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {codingProfile?.leetcodeId && (
+                  <div className="bg-gradient-to-r from-orange-500/20 to-orange-500/10 border border-orange-500/30 rounded-lg p-3">
+                    <p className="font-semibold text-orange-400">LeetCode</p>
+                    <p className="text-xs text-gray-400">{codingProfile.leetcodeStats?.solved || 0} problems</p>
+                  </div>
+                )}
+                {codingProfile?.hackerrankId && (
+                  <div className="bg-gradient-to-r from-green-500/20 to-green-500/10 border border-green-500/30 rounded-lg p-3">
+                    <p className="font-semibold text-green-400">HackerRank</p>
+                    <p className="text-xs text-gray-400">{codingProfile.hackerrankStats?.solved || 0} problems</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Daily Challenges */}
+        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 shadow-2xl mb-8">
+          <h2 className="text-2xl font-bold text-white mb-4">🎯 Daily Coding Challenges</h2>
+          <p className="text-sm text-gray-400 mb-4">Solved: {solvedCount}/{totalChallenges}</p>
           {challenges.length === 0 ? (
             <div className="text-center py-8">
-              <p className={isDarkMode ? "text-gray-400 mb-4" : "text-gray-600 mb-4"}>🎉 All challenges completed!</p>
-              <p className={`text-sm ${isDarkMode ? "text-gray-500" : "text-gray-500"}`}>New challenges will appear tomorrow or refresh the page</p>
+              <p className="text-gray-400 mb-2">🎉 All challenges completed!</p>
+              <p className="text-sm text-gray-500">New challenges will appear tomorrow</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {challenges.map((challenge) => (
-                <div key={challenge.id} className={`border rounded-lg p-3 transition-colors duration-300 ${
-                  isDarkMode ? "border-gray-700 hover:bg-gray-700" : "border-gray-200 hover:bg-gray-50"
-                }`}>
-                  <div className="flex items-start justify-between">
+                <div key={challenge.id} className="backdrop-blur-md bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all duration-300">
+                  <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className={`font-semibold text-sm ${isDarkMode ? "text-white" : ""}`}>{challenge.title}</h3>
-                        <span className={`text-xs px-2 py-1 rounded ${
-                          challenge.difficulty === "Easy" ? "bg-green-100 text-green-800" :
-                          challenge.difficulty === "Medium" ? "bg-yellow-100 text-yellow-800" :
-                          "bg-red-100 text-red-800"
-                        }`}>
-                          {challenge.difficulty}
-                        </span>
-                      </div>
-                      <p className={`text-xs mb-2 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>{challenge.description}</p>
-                      <div className="flex items-center gap-2">
-                        <a
-                          href={challenge.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`text-xs hover:underline ${isDarkMode ? "text-blue-400" : "text-blue-600"}`}
-                        >
-                          View on LeetCode →
-                        </a>
-                      </div>
+                      <h3 className="font-semibold text-white text-sm mb-1">{challenge.title}</h3>
+                      <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                        challenge.difficulty === "Easy" ? "bg-green-500/30 text-green-300" :
+                        challenge.difficulty === "Medium" ? "bg-yellow-500/30 text-yellow-300" :
+                        "bg-red-500/30 text-red-300"
+                      }`}>
+                        {challenge.difficulty}
+                      </span>
                     </div>
+                  </div>
+                  <p className="text-xs text-gray-400 mb-3">{challenge.description}</p>
+                  <div className="flex gap-2">
+                    <a
+                      href={challenge.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 text-xs text-center bg-white/10 hover:bg-white/20 text-gray-300 px-2 py-2 rounded-lg transition-all duration-300"
+                    >
+                      View
+                    </a>
                     <button
                       onClick={() => handleSolveChallenge(challenge.id)}
                       disabled={solvingId === challenge.id}
-                      className="ml-4 bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700 disabled:opacity-50 whitespace-nowrap"
+                      className="flex-1 text-xs bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-2 py-2 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50"
                     >
-                      {solvingId === challenge.id ? "Marking..." : "✓ Solved"}
+                      {solvingId === challenge.id ? "..." : "✓"}
                     </button>
                   </div>
                 </div>
@@ -269,124 +258,71 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Daily Reminder & Streak */}
-        <div className={`p-6 rounded-xl shadow-md transition-colors duration-300 ${
-          isDarkMode ? "bg-gray-800 border border-gray-700" : "bg-white"
-        }`}>
-          <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-white" : ""}`}>🔥 CodeMentor AI Streak</h2>
-          <div className="space-y-4">
-            <div className="text-center">
-              <p className="text-4xl font-bold text-orange-600">{streak}</p>
-              <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>Day Streak</p>
-              <p className={`text-xs mt-2 ${isDarkMode ? "text-gray-500" : "text-gray-500"}`}>
-                Longest: <span className="font-bold text-purple-600">{longestStreak}</span> days
-              </p>
+        {/* Streak & Contests */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Streak Card */}
+          <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 shadow-2xl">
+            <h2 className="text-2xl font-bold text-white mb-4">🔥 CodeMentor AI Streak</h2>
+            <div className="text-center mb-6">
+              <p className="text-5xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">{streak}</p>
+              <p className="text-gray-400 text-sm">Day Streak</p>
+              <p className="text-xs text-gray-500 mt-2">Longest: <span className="text-purple-400 font-bold">{longestStreak}</span> days</p>
             </div>
             {streak > 0 ? (
-              <div className={`border-l-4 border-orange-500 p-3 rounded ${isDarkMode ? "bg-gray-700" : "bg-orange-50"}`}>
-                <p className={`text-sm font-semibold ${isDarkMode ? "text-orange-400" : "text-orange-900"}`}>Keep it up! 🎉</p>
-                <p className={`text-xs mt-1 ${isDarkMode ? "text-orange-300" : "text-orange-800"}`}>
-                  Log in tomorrow to maintain your streak
-                </p>
+              <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-lg p-4">
+                <p className="text-sm font-semibold text-orange-300">Keep it up! 🎉</p>
+                <p className="text-xs text-orange-200 mt-1">Log in tomorrow to maintain your streak</p>
               </div>
             ) : (
-              <div className={`border-l-4 border-blue-500 p-3 rounded ${isDarkMode ? "bg-gray-700" : "bg-blue-50"}`}>
-                <p className={`text-sm font-semibold ${isDarkMode ? "text-blue-400" : "text-blue-900"}`}>Start your streak! 🚀</p>
-                <p className={`text-xs mt-1 ${isDarkMode ? "text-blue-300" : "text-blue-800"}`}>
-                  Log in daily to build your CodeMentor AI streak
-                </p>
+              <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-lg p-4">
+                <p className="text-sm font-semibold text-blue-300">Start your streak! 🚀</p>
+                <p className="text-xs text-blue-200 mt-1">Log in daily to build your streak</p>
               </div>
             )}
-            <div className="space-y-2">
-              <p className={`text-xs font-semibold ${isDarkMode ? "text-gray-400" : "text-gray-700"}`}>This Week</p>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-                  <div
-                    key={day}
-                    className={`w-6 h-6 rounded text-xs flex items-center justify-center font-semibold ${
-                      day <= streak ? "bg-orange-500 text-white" : isDarkMode ? "bg-gray-700 text-gray-400" : "bg-gray-200 text-gray-600"
-                    }`}
-                  >
-                    {day}
+          </div>
+
+          {/* Contests Card */}
+          <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 shadow-2xl">
+            <h2 className="text-2xl font-bold text-white mb-4">🏆 Upcoming Contests</h2>
+            {contestsLoading ? (
+              <p className="text-gray-400">Loading contests...</p>
+            ) : contests.length === 0 ? (
+              <p className="text-gray-400">No upcoming contests</p>
+            ) : (
+              <div className="space-y-3">
+                {contests.slice(0, 3).map((contest) => (
+                  <div key={contest.id} className="backdrop-blur-md bg-white/5 border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all duration-300">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-white text-sm">{contest.title}</h3>
+                        <p className="text-xs text-gray-400">{contest.platform}</p>
+                      </div>
+                    </div>
+                    <CountdownTimer startTime={contest.startTime} title={contest.title} />
                   </div>
                 ))}
               </div>
-            </div>
+            )}
           </div>
         </div>
+
+        {/* Weekly Progress Chart */}
+        <WeeklyProgressChart />
       </div>
-
-      {/* Upcoming Contests */}
-      <div className={`p-6 rounded-xl shadow-md transition-colors duration-300 ${
-        isDarkMode ? "bg-gray-800 border border-gray-700" : "bg-white"
-      }`}>
-        <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-white" : ""}`}>🏆 Upcoming Contests</h2>
-        {contestsLoading ? (
-          <p className={isDarkMode ? "text-gray-400" : "text-gray-600"}>Loading contests...</p>
-        ) : contests.length === 0 ? (
-          <p className={isDarkMode ? "text-gray-400" : "text-gray-600"}>No upcoming contests found</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {contests.slice(0, 6).map((contest) => (
-              <div
-                key={contest.id}
-                className={`border rounded-lg p-4 transition-colors duration-300 flex flex-col ${
-                  isDarkMode ? "border-gray-700 hover:bg-gray-700" : "border-gray-200 hover:bg-gray-50"
-                }`}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <h3 className={`font-semibold text-sm ${isDarkMode ? "text-white" : ""}`}>{contest.title}</h3>
-                    <p className={`text-xs mt-1 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-                      {contest.platform}
-                    </p>
-                  </div>
-                  <span className={`text-xs px-2 py-1 rounded font-semibold whitespace-nowrap ml-2 ${
-                    contest.platform === "LeetCode" ? "bg-orange-100 text-orange-800" :
-                    contest.platform === "CodeForces" ? "bg-blue-100 text-blue-800" :
-                    "bg-purple-100 text-purple-800"
-                  }`}>
-                    {contest.platform}
-                  </span>
-                </div>
-                
-                <div className="mb-3 py-2">
-                  <CountdownTimer startTime={contest.startTime} title={contest.title} />
-                </div>
-
-                <p className={`text-xs mb-4 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-                  {new Date(contest.startTime).toLocaleString()}
-                </p>
-
-                <a
-                  href={contest.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-auto inline-flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded text-sm font-medium transition w-full"
-                >
-                  <span>Register</span>
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Weekly Progress Chart */}
-      <WeeklyProgressChart />
     </div>
   );
 }
 
-function StatCard({ title, value, icon }) {
-  const { isDarkMode } = useTheme();
+function StatCard({ title, value, icon, gradient }) {
   return (
-    <div className={`p-4 rounded-xl shadow text-center transition-colors duration-300 ${
-      isDarkMode ? "bg-gray-800 border border-gray-700" : "bg-white"
-    }`}>
-      <h3 className={`text-md ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>{icon} {title}</h3>
-      <p className={`text-2xl font-bold ${isDarkMode ? "text-purple-400" : "text-purple-700"}`}>{value}</p>
+    <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 shadow-2xl">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm text-gray-400">{title}</h3>
+        <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${gradient} flex items-center justify-center text-lg`}>
+          {icon}
+        </div>
+      </div>
+      <p className="text-3xl font-bold text-white">{value}</p>
     </div>
   );
 }
