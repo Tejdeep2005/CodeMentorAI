@@ -22,7 +22,8 @@ const authUser = asyncHandler(async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      streak: user.streak,
+      streak: user.streak.current,
+      longestStreak: user.streak.longest,
     })
   } else {
     res.status(401)
@@ -59,12 +60,18 @@ const registerUser = asyncHandler(async (req, res) => {
     userId: user._id,
   })
 
+  // Initialize streak on first registration
+  user.updateStreak()
+  await user.save()
+
   generateToken(res, user._id)
 
   res.status(201).json({
     _id: user._id,
     name: user.name,
     email: user.email,
+    streak: user.streak.current,
+    longestStreak: user.streak.longest,
   })
 })
 
