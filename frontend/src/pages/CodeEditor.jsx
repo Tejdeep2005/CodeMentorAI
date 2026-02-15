@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useTheme } from "@/context/ThemeContext";
-import { Play, Send, Copy, Download, Trash2, MessageCircle } from "lucide-react";
+import { Play, Copy, Download, Trash2, MessageCircle } from "lucide-react";
 
 const CodeEditor = () => {
   const { isDarkMode } = useTheme();
@@ -11,10 +11,24 @@ const CodeEditor = () => {
   const [output, setOutput] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [chatMessages, setChatMessages] = useState([]);
-  const [chatInput, setChatInput] = useState("");
   const [showChat, setShowChat] = useState(false);
   const [executionTime, setExecutionTime] = useState(0);
+
+  // Load Noupe chatbot script when showChat is true
+  useEffect(() => {
+    if (showChat) {
+      const script = document.createElement("script");
+      script.src = "https://www.noupe.com/embed/019c5fc4cfac7578b7dbb55a4fda9bfce510.js";
+      script.async = true;
+      document.body.appendChild(script);
+
+      return () => {
+        if (document.body.contains(script)) {
+          document.body.removeChild(script);
+        }
+      };
+    }
+  }, [showChat]);
 
   const languages = [
     { value: "python3", label: "Python 3" },
@@ -37,10 +51,11 @@ const CodeEditor = () => {
     setError("");
     setOutput("");
     const startTime = Date.now();
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/code-editor/execute",
+        `${apiUrl}/api/code-editor/execute`,
         {
           code,
           language,
@@ -62,40 +77,21 @@ const CodeEditor = () => {
   };
 
   const handleGetAssistance = async () => {
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/code-editor/assist",
+        `${apiUrl}/api/code-editor/assist`,
         {
           code,
           language,
           error: error || undefined,
-          question: chatInput || "Explain this code",
+          question: "Explain this code",
         },
         { withCredentials: true }
       );
-
-      const assistance = res.data.assistance;
-      setChatMessages([
-        ...chatMessages,
-        {
-          type: "user",
-          message: chatInput || "Explain this code",
-        },
-        {
-          type: "ai",
-          message: assistance.explanation,
-          suggestion: assistance.suggestion,
-        },
-      ]);
-      setChatInput("");
+      console.log("Assistance received:", res.data);
     } catch (err) {
-      setChatMessages([
-        ...chatMessages,
-        {
-          type: "error",
-          message: "Failed to get assistance",
-        },
-      ]);
+      console.error("Failed to get assistance:", err);
     }
   };
 
@@ -274,7 +270,7 @@ const CodeEditor = () => {
               {showChat ? "Hide" : "Show"} AI Assistant
             </button>
 
-            {/* AI Chat */}
+            {/* Noupe AI Chat */}
             {showChat && (
               <div className={`rounded-lg shadow-lg overflow-hidden ${
                 isDarkMode ? "bg-gray-800" : "bg-white"
@@ -282,57 +278,8 @@ const CodeEditor = () => {
                 <div className={`p-4 border-b font-semibold ${isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-gray-50"}`}>
                   🤖 AI Assistant
                 </div>
-                <div className={`h-48 overflow-y-auto p-4 space-y-3 ${
-                  isDarkMode ? "bg-gray-900" : "bg-gray-50"
-                }`}>
-                  {chatMessages.length === 0 ? (
-                    <p className={`text-sm ${isDarkMode ? "text-gray-500" : "text-gray-400"}`}>
-                      Ask me anything about your code!
-                    </p>
-                  ) : (
-                    chatMessages.map((msg, idx) => (
-                      <div key={idx} className={`text-sm ${
-                        msg.type === "user" ? "text-right" : msg.type === "error" ? "text-red-500" : "text-left"
-                      }`}>
-                        <div className={`inline-block max-w-xs p-2 rounded ${
-                          msg.type === "user"
-                            ? "bg-purple-600 text-white"
-                            : msg.type === "error"
-                            ? "bg-red-100 text-red-700"
-                            : isDarkMode
-                            ? "bg-gray-700 text-gray-100"
-                            : "bg-gray-200 text-gray-900"
-                        }`}>
-                          {msg.message}
-                        </div>
-                        {msg.suggestion && (
-                          <div className={`text-xs mt-1 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-                            💡 {msg.suggestion}
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
-                <div className={`p-3 border-t flex gap-2 ${isDarkMode ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-gray-50"}`}>
-                  <input
-                    type="text"
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && handleGetAssistance()}
-                    placeholder="Ask for help..."
-                    className={`flex-1 px-3 py-2 text-sm rounded border focus:outline-none focus:border-purple-500 ${
-                      isDarkMode
-                        ? "bg-gray-900 border-gray-700 text-gray-100"
-                        : "bg-white border-gray-300 text-gray-900"
-                    }`}
-                  />
-                  <button
-                    onClick={handleGetAssistance}
-                    className="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded text-sm font-medium transition"
-                  >
-                    <Send className="w-4 h-4" />
-                  </button>
+                <div className={`p-4 min-h-96 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
+                  {/* Noupe chatbot will be injected here */}
                 </div>
               </div>
             )}
