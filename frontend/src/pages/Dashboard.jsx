@@ -5,7 +5,7 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import CountdownTimer from "@/components/CountdownTimer";
 import WeeklyProgressChart from "@/components/WeeklyProgressChart";
-import { ExternalLink } from "lucide-react";
+import "./dashboard.css";
 
 export default function Dashboard() {
   const { user } = useUser();
@@ -172,12 +172,21 @@ export default function Dashboard() {
   const hasAnyProfile = codingProfile?.leetcodeId || codingProfile?.hackerrankId || codingProfile?.codechefId;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="dashboard-container min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 p-6 overflow-hidden">
+      {/* Animated background elements */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 right-0 w-96 h-96 bg-cyan-600/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">👋 Welcome, {userName}!</h1>
-          <p className="text-gray-400">Track your progress and master DSA</p>
+          <h1 className="text-5xl font-black bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2 animate-pulse">
+            👋 Welcome, {userName}!
+          </h1>
+          <p className="text-transparent bg-gradient-to-r from-gray-300 to-gray-500 bg-clip-text text-lg font-semibold">Track your progress and master DSA</p>
         </div>
 
         {/* Stats Grid */}
@@ -211,160 +220,204 @@ export default function Dashboard() {
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {/* AI Interview Card */}
-          <div className="lg:col-span-2 backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 shadow-2xl">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-white">🤖 AI Interview</h2>
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-xl">
+          <div className="lg:col-span-2 group relative backdrop-blur-2xl bg-gradient-to-br from-white/15 to-white/5 border border-white/30 rounded-3xl p-8 hover:from-white/25 hover:to-white/10 transition-all duration-500 shadow-2xl overflow-hidden">
+            {/* Glossy shine effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -skew-x-12 group-hover:translate-x-full" style={{animation: 'shine 3s infinite'}}></div>
+            
+            {/* Glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-2xl"></div>
+            
+            <div className="relative z-10 flex items-center justify-between mb-6">
+              <h2 className="text-3xl font-black bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">🤖 AI Interview</h2>
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-2xl shadow-lg transform group-hover:scale-110 transition-transform duration-300">
                 🎬
               </div>
             </div>
             {stats.lastInterviewScore > 0 ? (
               <>
-                <p className="text-gray-300 mb-4">Your last score: <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">{stats.lastInterviewScore}%</span></p>
+                <p className="text-gray-300 mb-6 text-lg">Your last score: <span className="text-3xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">{stats.lastInterviewScore}%</span></p>
                 <button 
                   onClick={() => navigate("/app/interview")}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105"
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl"
                 >
                   Start Mock Interview
                 </button>
               </>
             ) : (
-              <p className="text-gray-400">No interviews taken yet. Start your first mock interview!</p>
+              <p className="text-gray-400 text-lg">No interviews taken yet. Start your first mock interview!</p>
             )}
           </div>
 
           {/* Coding Progress Card */}
-          <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 shadow-2xl">
-            <h2 className="text-xl font-bold text-white mb-4">💻 Coding Progress</h2>
-            {!hasAnyProfile ? (
-              <div>
-                <p className="text-sm text-gray-400 mb-4">Connect your coding profiles to track progress</p>
-                <Link
-                  to="/app/coding-profiles"
-                  className="inline-block w-full text-center bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300"
-                >
-                  Add Profiles
-                </Link>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {codingProfile?.leetcodeId && (
-                  <div className="bg-gradient-to-r from-orange-500/20 to-orange-500/10 border border-orange-500/30 rounded-lg p-3">
-                    <p className="font-semibold text-orange-400">LeetCode</p>
-                    <p className="text-xs text-gray-400">{codingProfile.leetcodeStats?.solved || 0} problems</p>
-                  </div>
-                )}
-                {codingProfile?.hackerrankId && (
-                  <div className="bg-gradient-to-r from-green-500/20 to-green-500/10 border border-green-500/30 rounded-lg p-3">
-                    <p className="font-semibold text-green-400">HackerRank</p>
-                    <p className="text-xs text-gray-400">{codingProfile.hackerrankStats?.solved || 0} problems</p>
-                  </div>
-                )}
-              </div>
-            )}
+          <div className="group relative backdrop-blur-2xl bg-gradient-to-br from-white/15 to-white/5 border border-white/30 rounded-3xl p-8 hover:from-white/25 hover:to-white/10 transition-all duration-500 shadow-2xl overflow-hidden">
+            {/* Glossy shine effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -skew-x-12 group-hover:translate-x-full" style={{animation: 'shine 3s infinite'}}></div>
+            
+            {/* Glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-2xl"></div>
+            
+            <div className="relative z-10">
+              <h2 className="text-2xl font-black bg-gradient-to-r from-blue-300 to-cyan-300 bg-clip-text text-transparent mb-6">💻 Coding Progress</h2>
+              {!hasAnyProfile ? (
+                <div>
+                  <p className="text-sm text-gray-400 mb-4">Connect your coding profiles to track progress</p>
+                  <Link
+                    to="/app/coding-profiles"
+                    className="inline-block w-full text-center bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white px-4 py-3 rounded-lg text-sm font-bold transition-all duration-300 shadow-lg hover:shadow-xl"
+                  >
+                    Add Profiles
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {codingProfile?.leetcodeId && (
+                    <div className="backdrop-blur-md bg-gradient-to-r from-orange-500/30 to-orange-500/10 border border-orange-500/50 rounded-xl p-4 hover:from-orange-500/40 hover:to-orange-500/20 transition-all duration-300">
+                      <p className="font-bold text-orange-300">LeetCode</p>
+                      <p className="text-xs text-gray-300">{codingProfile.leetcodeStats?.solved || 0} problems</p>
+                    </div>
+                  )}
+                  {codingProfile?.hackerrankId && (
+                    <div className="backdrop-blur-md bg-gradient-to-r from-green-500/30 to-green-500/10 border border-green-500/50 rounded-xl p-4 hover:from-green-500/40 hover:to-green-500/20 transition-all duration-300">
+                      <p className="font-bold text-green-300">HackerRank</p>
+                      <p className="text-xs text-gray-300">{codingProfile.hackerrankStats?.solved || 0} problems</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Daily Challenges */}
-        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 shadow-2xl mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">🎯 Daily Coding Challenges</h2>
-          <p className="text-sm text-gray-400 mb-4">Solved: {solvedCount}/{totalChallenges}</p>
-          {challenges.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-400 mb-2">🎉 All challenges completed!</p>
-              <p className="text-sm text-gray-500">New challenges will appear tomorrow</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {challenges.map((challenge) => (
-                <div key={challenge.id} className="backdrop-blur-md bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all duration-300">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-white text-sm mb-1">{challenge.title}</h3>
-                      <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-                        challenge.difficulty === "Easy" ? "bg-green-500/30 text-green-300" :
-                        challenge.difficulty === "Medium" ? "bg-yellow-500/30 text-yellow-300" :
-                        "bg-red-500/30 text-red-300"
-                      }`}>
-                        {challenge.difficulty}
-                      </span>
+        <div className="group relative backdrop-blur-2xl bg-gradient-to-br from-white/15 to-white/5 border border-white/30 rounded-3xl p-8 hover:from-white/25 hover:to-white/10 transition-all duration-500 shadow-2xl mb-8 overflow-hidden">
+          {/* Glossy shine effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -skew-x-12 group-hover:translate-x-full" style={{animation: 'shine 3s infinite'}}></div>
+          
+          {/* Glow effect */}
+          <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-2xl"></div>
+          
+          <div className="relative z-10">
+            <h2 className="text-3xl font-black bg-gradient-to-r from-green-300 to-emerald-300 bg-clip-text text-transparent mb-4">🎯 Daily Coding Challenges</h2>
+            <p className="text-sm text-gray-400 mb-6 font-semibold">Solved: <span className="text-green-300 font-bold">{solvedCount}/{totalChallenges}</span></p>
+            {challenges.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-300 mb-2 text-xl font-bold">🎉 All challenges completed!</p>
+                <p className="text-sm text-gray-500">New challenges will appear tomorrow</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {challenges.map((challenge) => (
+                  <div key={challenge.id} className="group/card relative backdrop-blur-md bg-gradient-to-br from-white/10 to-white/5 border border-white/20 rounded-2xl p-5 hover:from-white/20 hover:to-white/10 transition-all duration-300 overflow-hidden">
+                    {/* Card shine */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 transform -skew-x-12 group-hover/card:translate-x-full"></div>
+                    
+                    <div className="relative z-10 flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h3 className="font-bold text-white text-sm mb-2">{challenge.title}</h3>
+                        <span className={`text-xs px-3 py-1 rounded-full font-bold ${
+                          challenge.difficulty === "Easy" ? "bg-green-500/40 text-green-200 border border-green-500/60" :
+                          challenge.difficulty === "Medium" ? "bg-yellow-500/40 text-yellow-200 border border-yellow-500/60" :
+                          "bg-red-500/40 text-red-200 border border-red-500/60"
+                        }`}>
+                          {challenge.difficulty}
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-400 mb-4">{challenge.description}</p>
+                    <div className="flex gap-2">
+                      <a
+                        href={challenge.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 text-xs text-center bg-white/10 hover:bg-white/20 text-gray-300 px-3 py-2 rounded-lg transition-all duration-300 font-semibold border border-white/20"
+                      >
+                        View
+                      </a>
+                      <button
+                        onClick={() => handleSolveChallenge(challenge.id)}
+                        disabled={solvingId === challenge.id}
+                        className="flex-1 text-xs bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-3 py-2 rounded-lg font-bold transition-all duration-300 disabled:opacity-50 shadow-lg"
+                      >
+                        {solvingId === challenge.id ? "..." : "✓"}
+                      </button>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-400 mb-3">{challenge.description}</p>
-                  <div className="flex gap-2">
-                    <a
-                      href={challenge.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 text-xs text-center bg-white/10 hover:bg-white/20 text-gray-300 px-2 py-2 rounded-lg transition-all duration-300"
-                    >
-                      View
-                    </a>
-                    <button
-                      onClick={() => handleSolveChallenge(challenge.id)}
-                      disabled={solvingId === challenge.id}
-                      className="flex-1 text-xs bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-2 py-2 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50"
-                    >
-                      {solvingId === challenge.id ? "..." : "✓"}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Streak & Contests */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Streak Card */}
-          <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 shadow-2xl">
-            <h2 className="text-2xl font-bold text-white mb-4">🔥 CodeMentor AI Streak</h2>
-            <div className="text-center mb-6">
-              <p className="text-5xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">{streak}</p>
-              <p className="text-gray-400 text-sm">Day Streak</p>
-              <p className="text-xs text-gray-500 mt-2">Longest: <span className="text-purple-400 font-bold">{longestStreak}</span> days</p>
+          <div className="group relative backdrop-blur-2xl bg-gradient-to-br from-white/15 to-white/5 border border-white/30 rounded-3xl p-8 hover:from-white/25 hover:to-white/10 transition-all duration-500 shadow-2xl overflow-hidden">
+            {/* Glossy shine effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -skew-x-12 group-hover:translate-x-full" style={{animation: 'shine 3s infinite'}}></div>
+            
+            {/* Glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-red-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-2xl"></div>
+            
+            <div className="relative z-10">
+              <h2 className="text-3xl font-black bg-gradient-to-r from-orange-300 to-red-300 bg-clip-text text-transparent mb-8">🔥 CodeMentor AI Streak</h2>
+              <div className="text-center mb-8">
+                <p className="text-6xl font-black bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent drop-shadow-lg">{streak}</p>
+                <p className="text-gray-400 text-sm font-semibold mt-2">Day Streak</p>
+                <p className="text-xs text-gray-500 mt-3">Longest: <span className="text-purple-300 font-black text-lg">{longestStreak}</span> days</p>
+              </div>
+              {streak > 0 ? (
+                <div className="backdrop-blur-md bg-gradient-to-r from-orange-500/30 to-red-500/30 border border-orange-500/50 rounded-2xl p-6 hover:from-orange-500/40 hover:to-red-500/40 transition-all duration-300">
+                  <p className="text-sm font-bold text-orange-300">Keep it up! 🎉</p>
+                  <p className="text-xs text-orange-200 mt-2">Log in tomorrow to maintain your streak</p>
+                </div>
+              ) : (
+                <div className="backdrop-blur-md bg-gradient-to-r from-blue-500/30 to-cyan-500/30 border border-blue-500/50 rounded-2xl p-6 hover:from-blue-500/40 hover:to-cyan-500/40 transition-all duration-300">
+                  <p className="text-sm font-bold text-blue-300">Start your streak! 🚀</p>
+                  <p className="text-xs text-blue-200 mt-2">Log in daily to build your streak</p>
+                </div>
+              )}
             </div>
-            {streak > 0 ? (
-              <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-lg p-4">
-                <p className="text-sm font-semibold text-orange-300">Keep it up! 🎉</p>
-                <p className="text-xs text-orange-200 mt-1">Log in tomorrow to maintain your streak</p>
-              </div>
-            ) : (
-              <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-lg p-4">
-                <p className="text-sm font-semibold text-blue-300">Start your streak! 🚀</p>
-                <p className="text-xs text-blue-200 mt-1">Log in daily to build your streak</p>
-              </div>
-            )}
           </div>
 
           {/* Contests Card */}
-          <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 shadow-2xl">
-            <h2 className="text-2xl font-bold text-white mb-4">🏆 Upcoming Contests</h2>
-            {contestsLoading ? (
-              <p className="text-gray-400">Loading contests...</p>
-            ) : contests.length === 0 ? (
-              <p className="text-gray-400">No upcoming contests</p>
-            ) : (
-              <div className="space-y-3">
-                {contests.slice(0, 3).map((contest) => (
-                  <a
-                    key={contest.id}
-                    href={contest.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="backdrop-blur-md bg-white/5 border border-white/10 rounded-lg p-3 hover:bg-white/10 transition-all duration-300 block"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-white text-sm">{contest.title}</h3>
-                        <p className="text-xs text-gray-400">{contest.platform}</p>
+          <div className="group relative backdrop-blur-2xl bg-gradient-to-br from-white/15 to-white/5 border border-white/30 rounded-3xl p-8 hover:from-white/25 hover:to-white/10 transition-all duration-500 shadow-2xl overflow-hidden">
+            {/* Glossy shine effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -skew-x-12 group-hover:translate-x-full" style={{animation: 'shine 3s infinite'}}></div>
+            
+            {/* Glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-amber-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-2xl"></div>
+            
+            <div className="relative z-10">
+              <h2 className="text-3xl font-black bg-gradient-to-r from-yellow-300 to-amber-300 bg-clip-text text-transparent mb-6">🏆 Upcoming Contests</h2>
+              {contestsLoading ? (
+                <p className="text-gray-400 font-semibold">Loading contests...</p>
+              ) : contests.length === 0 ? (
+                <p className="text-gray-400 font-semibold">No upcoming contests</p>
+              ) : (
+                <div className="space-y-3">
+                  {contests.slice(0, 3).map((contest) => (
+                    <a
+                      key={contest.id}
+                      href={contest.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group/contest relative backdrop-blur-md bg-gradient-to-r from-white/10 to-white/5 border border-white/20 rounded-2xl p-4 hover:from-white/20 hover:to-white/10 transition-all duration-300 block overflow-hidden"
+                    >
+                      {/* Contest card shine */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover/contest:opacity-100 transition-opacity duration-500 transform -skew-x-12 group-hover/contest:translate-x-full"></div>
+                      
+                      <div className="relative z-10 flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <h3 className="font-bold text-white text-sm">{contest.title}</h3>
+                          <p className="text-xs text-gray-400 font-semibold">{contest.platform}</p>
+                        </div>
                       </div>
-                    </div>
-                    <CountdownTimer startTime={contest.startTime} title={contest.title} />
-                  </a>
-                ))}
-              </div>
-            )}
+                      <CountdownTimer startTime={contest.startTime} title={contest.title} />
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -377,14 +430,20 @@ export default function Dashboard() {
 
 function StatCard({ title, value, icon, gradient }) {
   return (
-    <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 shadow-2xl">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm text-gray-400">{title}</h3>
-        <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${gradient} flex items-center justify-center text-lg`}>
+    <div className="stat-card group relative backdrop-blur-2xl bg-gradient-to-br from-white/15 to-white/5 border border-white/30 rounded-2xl p-6 hover:from-white/25 hover:to-white/10 transition-all duration-500 shadow-2xl overflow-hidden">
+      {/* Glossy shine effect */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -skew-x-12 group-hover:translate-x-full" style={{animation: 'shine 3s infinite'}}></div>
+      
+      {/* Glow effect */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-2xl blur-xl`}></div>
+      
+      <div className="relative z-10 flex items-center justify-between mb-4">
+        <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider">{title}</h3>
+        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-xl shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
           {icon}
         </div>
       </div>
-      <p className="text-3xl font-bold text-white">{value}</p>
+      <p className="text-4xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">{value}</p>
     </div>
   );
 }
