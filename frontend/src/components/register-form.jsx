@@ -31,8 +31,9 @@ export function RegisterForm(props) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000"
       const response = await axios
-        .post("http://localhost:3000/api/users/", {
+        .post(`${apiUrl}/api/users/`, {
           name,
           email,
           password,
