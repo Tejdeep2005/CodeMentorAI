@@ -64,6 +64,7 @@ const getCodeAssistance = asyncHandler(async (req, res) => {
 const executeWithJudge0 = async (code, language, input) => {
   try {
     const languageMap = {
+      python: 71,
       python3: 71,
       java: 62,
       cpp: 54,
