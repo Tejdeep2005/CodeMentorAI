@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useTheme } from "@/context/ThemeContext";
 import { Play, Copy, Download, Trash2, MessageCircle, X } from "lucide-react";
+import Editor from "@monaco-editor/react";
 
 const CodeEditor = () => {
   const { isDarkMode } = useTheme();
-  const [code, setCode] = useState("// Write your code here\n");
-  const [language, setLanguage] = useState("python3");
+  const [code, setCode] = useState("# Write your code here\n");
+  const [language, setLanguage] = useState("python");
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [error, setError] = useState("");
@@ -40,15 +41,15 @@ const CodeEditor = () => {
   }, [showChat]);
 
   const languages = [
-    { value: "python3", label: "Python 3" },
-    { value: "java", label: "Java" },
-    { value: "cpp", label: "C++" },
-    { value: "c", label: "C" },
-    { value: "javascript", label: "JavaScript" },
+    { value: "python", label: "Python 3", apiValue: "python3" },
+    { value: "java", label: "Java", apiValue: "java" },
+    { value: "cpp", label: "C++", apiValue: "cpp" },
+    { value: "c", label: "C", apiValue: "c" },
+    { value: "javascript", label: "JavaScript", apiValue: "javascript" },
   ];
 
   const languageTemplates = {
-    python3: "# Python 3\ndef main():\n    print('Hello, World!')\n\nif __name__ == '__main__':\n    main()",
+    python: "# Python 3\ndef main():\n    print('Hello, World!')\n\nif __name__ == '__main__':\n    main()",
     java: "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}",
     cpp: "#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"Hello, World!\" << endl;\n    return 0;\n}",
     c: "#include <stdio.h>\n\nint main() {\n    printf(\"Hello, World!\\n\");\n    return 0;\n}",
@@ -63,11 +64,14 @@ const CodeEditor = () => {
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
     try {
+      const langObj = languages.find(l => l.value === language);
+      const apiLanguage = langObj?.apiValue || language;
+
       const res = await axios.post(
         `${apiUrl}/api/code-editor/execute`,
         {
           code,
-          language,
+          language: apiLanguage,
           input,
         },
         { withCredentials: true }
@@ -88,11 +92,14 @@ const CodeEditor = () => {
   const handleGetAssistance = async () => {
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
     try {
+      const langObj = languages.find(l => l.value === language);
+      const apiLanguage = langObj?.apiValue || language;
+
       const res = await axios.post(
         `${apiUrl}/api/code-editor/assist`,
         {
           code,
-          language,
+          language: apiLanguage,
           error: error || undefined,
           question: "Explain this code",
         },
@@ -113,7 +120,8 @@ const CodeEditor = () => {
     const element = document.createElement("a");
     const file = new Blob([code], { type: "text/plain" });
     element.href = URL.createObjectURL(file);
-    element.download = `code.${language === "python3" ? "py" : language === "java" ? "java" : language === "cpp" ? "cpp" : language === "c" ? "c" : "js"}`;
+    const ext = language === "python" ? "py" : language === "java" ? "java" : language === "cpp" ? "cpp" : language === "c" ? "c" : "js";
+    element.download = `code.${ext}`;
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
@@ -168,17 +176,31 @@ const CodeEditor = () => {
               </div>
             </div>
 
-            {/* Code Editor */}
-            <div className={`p-4 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
-              <textarea
+            {/* Monaco Code Editor */}
+            <div className="h-96">
+              <Editor
+                height="100%"
+                language={language}
                 value={code}
-                onChange={(e) => setCode(e.target.value)}
-                className={`w-full h-96 p-4 font-mono text-sm rounded border-2 focus:outline-none focus:border-purple-500 ${
-                  isDarkMode
-                    ? "bg-gray-900 border-gray-700 text-gray-100"
-                    : "bg-gray-50 border-gray-300 text-gray-900"
-                }`}
-                spellCheck="false"
+                onChange={(value) => setCode(value || "")}
+                theme={isDarkMode ? "vs-dark" : "vs-light"}
+                options={{
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  fontFamily: "'Fira Code', 'Courier New', monospace",
+                  automaticLayout: true,
+                  tabSize: 4,
+                  insertSpaces: true,
+                  formatOnPaste: true,
+                  formatOnType: true,
+                  autoClosingBrackets: "always",
+                  autoClosingQuotes: "always",
+                  autoIndent: "full",
+                  bracketPairColorization: {
+                    enabled: true,
+                  },
+                  "bracketPairColorization.independentColorPoolPerBracketType": true,
+                }}
               />
             </div>
 
