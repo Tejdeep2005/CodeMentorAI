@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 export default function Interview() {
   const { user } = useUser();
   const navigate = useNavigate();
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
   const [stage, setStage] = useState("role-selection"); // role-selection, interview, results
   const [roles, setRoles] = useState([]);
   const [selectedRole, setSelectedRole] = useState(null);
@@ -50,7 +51,7 @@ export default function Interview() {
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/interview/roles", {
+        const response = await axios.get(`${apiUrl}/api/interview/roles`, {
           withCredentials: true,
         });
         setRoles(response.data.roles);
@@ -59,13 +60,13 @@ export default function Interview() {
       }
     };
     fetchRoles();
-  }, []);
+  }, [apiUrl]);
 
   // Fetch questions for selected role
   const startInterview = async (role) => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:3000/api/interview/questions", {
+      const response = await axios.get(`${apiUrl}/api/interview/questions`, {
         params: { role, count: 5 },
         withCredentials: true,
       });
@@ -124,7 +125,7 @@ export default function Interview() {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/interview/evaluate",
+        `${apiUrl}/api/interview/evaluate`,
         {
           question: questions[currentQuestionIndex],
           answer: currentAnswer,
@@ -164,7 +165,7 @@ export default function Interview() {
 
     try {
       await axios.post(
-        "http://localhost:3000/api/interview/save-result",
+        `${apiUrl}/api/interview/save-result`,
         {
           role: selectedRole,
           score: avgScore,
