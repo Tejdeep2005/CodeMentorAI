@@ -355,18 +355,23 @@ const getDailyChallenges = asyncHandler(async (req, res) => {
   today.setHours(0, 0, 0, 0)
   
   let lastResetDate = profile.dailyChallenges?.lastResetDate
+  let needsReset = false
+  
   if (lastResetDate) {
     const lastReset = new Date(lastResetDate)
     lastReset.setHours(0, 0, 0, 0)
     
     // If it's a new day, reset solved challenges
     if (today > lastReset) {
-      profile.solvedChallenges = []
-      profile.dailyChallenges = { lastResetDate: new Date() }
-      await profile.save()
+      needsReset = true
     }
   } else {
     // First time, set the reset date
+    needsReset = true
+  }
+
+  if (needsReset) {
+    profile.solvedChallenges = []
     profile.dailyChallenges = { lastResetDate: new Date() }
     await profile.save()
   }
@@ -377,17 +382,8 @@ const getDailyChallenges = asyncHandler(async (req, res) => {
   // Filter unsolved challenges
   const unsolvedChallenges = allChallenges.filter((c) => !solvedIds.includes(c.id))
 
-  // If all challenges are solved, reset and show all again
-  let challengesToShow = unsolvedChallenges
-  if (unsolvedChallenges.length === 0) {
-    // Reset solved challenges and show all
-    profile.solvedChallenges = []
-    await profile.save()
-    challengesToShow = allChallenges
-  }
-
-  // Show ALL unsolved challenges (not just 4)
-  const displayChallenges = challengesToShow
+  // If all challenges are solved, show all again (they'll be marked as solved but still visible)
+  const displayChallenges = unsolvedChallenges.length > 0 ? unsolvedChallenges : allChallenges
 
   // Get real LeetCode streak from stored stats
   const leetcodeStreak = profile.leetcodeStats?.streak || 0

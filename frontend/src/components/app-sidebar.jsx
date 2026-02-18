@@ -62,6 +62,11 @@ const mainItems = [
     url: "/app/code-editor",
     icon: Terminal,
   },
+  {
+    title: "DSA ChatBot",
+    url: "/app/dsa-chatbot",
+    icon: HelpCircle,
+  },
 ];
 
 const generalItems = [

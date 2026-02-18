@@ -66,14 +66,10 @@ export default function Dashboard() {
         localStorage.setItem("userStreak", JSON.stringify(streakRes.data?.current || 0));
         localStorage.setItem("userLongestStreak", JSON.stringify(streakRes.data?.longest || 0));
         
-        // Cache other data in localStorage
+        // Cache other data in localStorage (but NOT challenges - they refresh daily)
         const dashboardData = {
           stats: statsRes.data,
           profile: profileRes.data,
-          challenges: challengeRes.data?.challenges || [],
-          leetcodeSolved: challengeRes.data?.leetcodeSolved || 0,
-          solvedCount: challengeRes.data?.solvedCount || 0,
-          totalChallenges: challengeRes.data?.totalChallenges || 0,
           contests: contestsRes.data?.contests || [],
           timestamp: new Date().getTime(),
         };
@@ -98,10 +94,6 @@ export default function Dashboard() {
           const data = JSON.parse(cached);
           setStats(data.stats);
           setCodingProfile(data.profile);
-          setChallenges(data.challenges);
-          setLeetcodeSolved(data.leetcodeSolved);
-          setSolvedCount(data.solvedCount);
-          setTotalChallenges(data.totalChallenges);
           setContests(data.contests);
         }
       } finally {
@@ -111,7 +103,7 @@ export default function Dashboard() {
     };
 
     if (user?._id) {
-      // Try to load from cache first for faster initial load
+      // Try to load from cache first for faster initial load (but not challenges)
       const cached = localStorage.getItem("dashboardCache");
       if (cached) {
         const data = JSON.parse(cached);
@@ -120,10 +112,6 @@ export default function Dashboard() {
         if (cacheAge < 5 * 60 * 1000) {
           setStats(data.stats);
           setCodingProfile(data.profile);
-          setChallenges(data.challenges);
-          setLeetcodeSolved(data.leetcodeSolved);
-          setSolvedCount(data.solvedCount);
-          setTotalChallenges(data.totalChallenges);
           setContests(data.contests);
           setLoading(false);
           setContestsLoading(false);
@@ -172,7 +160,7 @@ export default function Dashboard() {
   const hasAnyProfile = codingProfile?.leetcodeId || codingProfile?.hackerrankId || codingProfile?.codechefId;
 
   return (
-    <div className="dashboard-container min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 p-6 overflow-hidden">
+    <div className="dashboard-container min-h-screen bg-black p-6 overflow-hidden">
       {/* Animated background elements */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse"></div>

@@ -11,7 +11,16 @@ const authUser = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ email })
 
-  if (user && (await user.matchPassword(password))) {
+  if (!user) {
+    console.log(`Login attempt: User not found with email: ${email}`)
+    res.status(401)
+    throw new Error("Invalid email or password")
+  }
+
+  const isPasswordMatch = await user.matchPassword(password)
+  console.log(`Login attempt for ${email}: Password match = ${isPasswordMatch}`)
+
+  if (isPasswordMatch) {
     // Update streak on login
     user.updateStreak()
     await user.save()
